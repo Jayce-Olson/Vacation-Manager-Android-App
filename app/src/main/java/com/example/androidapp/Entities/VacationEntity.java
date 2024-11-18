@@ -9,6 +9,7 @@ public class VacationEntity {
     @PrimaryKey(autoGenerate = true)
     private int id;
 
+    // Below are the following required properties for a vacation entity
     @ColumnInfo(name="title")
     private String title;
 
