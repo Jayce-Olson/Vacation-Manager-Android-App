@@ -1,12 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:gravity="center">
+<!--
+    I am still new to XML/Android SKD so i'm just writing this to help me learn/rememeber:
+    views in android are individual components of the screen/UI. Below are some main types of
+    views in android:
+    TextView: for displaying text.
+    EditText: for inputting text
+    Button: (just a button)
+    ImageView: for displaying images
 
-    <TextView
+    In this app I will most likely just be using the TextView, EditText, and Button views.
+
+    To interact with these views in my code I would cal findViewById(R.id.{{id}})
+
+    -->
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- RecyclerView to display the list of vacations (Recyler view is initilized in MainActivity.java) -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerViewVacations"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/fabAddVacation"
+        android:padding="16dp" />
+
+    <!-- Add button (to add vacation)-->
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabAddVacation"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Hello, World!" />
-</LinearLayout>
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_margin="16dp"
+        app:srcCompat="@android:drawable/ic_input_add"
+        android:contentDescription="Add Vacation" />
+</RelativeLayout>
+
+

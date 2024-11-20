@@ -2,6 +2,7 @@ package com.example.androidapp.DAO;
 
 
 
+import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
@@ -23,6 +24,6 @@ public interface ExcursionDAO { // How to access/interact with Excursion table b
     @Delete
     void deleteExcursion(ExcursionEntity excursion);
 
-    @Query("SELECT * FROM ExcursionEntity WHERE vacation_Id = :vacationId")
-    List<ExcursionEntity> getExcursionsForVacation(int vacationId);
+    @Query("SELECT * FROM excursions WHERE vacation_Id = :vacationId")
+    LiveData<List<ExcursionEntity>> getExcursionsForVacation(int vacationId); // Using LiveData automatically multithreads the query
 }

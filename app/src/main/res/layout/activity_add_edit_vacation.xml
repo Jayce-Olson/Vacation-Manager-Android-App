@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!-- This is the input for Vacation Title -->
+        <EditText
+            android:id="@+id/editTextTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Title"
+            android:inputType="text" />
+
+        <!-- This is the input for Hotel -->
+        <EditText
+            android:id="@+id/editTextHotel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Hotel"
+            android:inputType="text" />
+
+        <!-- Start date input -->
+        <EditText
+            android:id="@+id/editTextStartDate"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Start Date (yyyy-MM-dd)"
+            android:inputType="date" />
+
+        <!-- End date input -->
+        <EditText
+            android:id="@+id/editTextEndDate"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="End Date (yyyy-MM-dd)"
+            android:inputType="date" />
+
+        <!-- The save button -->
+        <Button
+            android:id="@+id/buttonSave"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="Save" />
+    </LinearLayout>
+</ScrollView>
+
