@@ -1,5 +1,9 @@
 package com.example.androidapp.Adapters;
 
+import static androidx.core.content.ContextCompat.startActivity;
+
+import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -8,7 +12,10 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.example.androidapp.Activities.AddEditVacationActivity;
 import com.example.androidapp.Entities.VacationEntity;
+import com.example.androidapp.MainActivity;
 import com.example.androidapp.R;
 
 // This class is for binding vacation data to the view. It acts as a middle man between the database and the view(UI).
@@ -24,16 +31,17 @@ public class VacationAdapter extends ListAdapter<VacationEntity, VacationAdapter
     will have a listener for the "add vacation" button, while the addEditVacation activity will have a listener
     for the "save" button.
      */
-    private OnItemClickListener listener;
+    private Context context;
 
 
-    public VacationAdapter() {
+    public VacationAdapter(Context context) {
         // This calls a class within the parent a passes through a lambda that holds the logic
         // to determine what data in the view needs to be updated. The lambda is held and defined
         // in the vacationEntity class. This is a bit overkill for a school Assessment as this app
         // Will probably never work with over five vacations Entities at a time, but for good practice
         // and because if this was an actual app, this is what I should do.
         super(VacationEntity.anonymousDiffUtil); // The super class will use the override methods within anonymousDiffUtil
+        this.context = context; // Setting context so later I can open the AddEditVacationActivity (opening onclick attached to items)
     }
 
 
@@ -106,13 +114,10 @@ public class VacationAdapter extends ListAdapter<VacationEntity, VacationAdapter
             textViewStartDate = itemView.findViewById(R.id.textViewStartDate);
             textViewEndDate = itemView.findViewById(R.id.textViewEndDate);
 
-
-// Listens for clicks on the individual items in the list. Will be uncommented after debugging/testing
-//            itemView.setOnClickListener(view -> { // onClick listener that will go on each item view in the list.
-//                if (listener != null) { // Without this there could be a null pointer exception if somehow this got ran without a listener for the click
-//                    listener.onItemClick(getItem(getBindingAdapterPosition()));
-//                }
-//            });
+            // If I end up implementing another Adapter file then I will decouple this and put the onClick listener into it's own file
+            itemView.setOnClickListener(view -> { // onClick listener that will go on each item view in the list.
+                    onItemClick(getItem(getBindingAdapterPosition()));
+            });
 
         }
 
@@ -124,12 +129,19 @@ public class VacationAdapter extends ListAdapter<VacationEntity, VacationAdapter
         }
     }
 
-    public interface OnItemClickListener {
-        void onItemClick(VacationEntity vacation);
+//    public interface OnItemClickListener {
+//        void onItemClick(VacationEntity vacation);
+//    }
+// Below will be called when an item is clicked on. It opens the add/edit activity and auto fills it with the data of the clicked item.
+    public void onItemClick(VacationEntity vacation){
+        Intent intent = new Intent(context, AddEditVacationActivity.class);
+        intent.putExtra("Title", vacation.getTitle());
+        intent.putExtra("StartDate", vacation.getStartDate());
+        intent.putExtra("EndDate", vacation.getEndDate());
+        intent.putExtra("Hotel", vacation.getHotel());
+        intent.putExtra("isEditMode", true);
+        context.startActivity(intent); // Adapter doesn't have the startActivity method so I need to use context.
     }
 
-    public void setOnItemClickListener(OnItemClickListener listener) {
-        this.listener = listener;
-    }
 }
 

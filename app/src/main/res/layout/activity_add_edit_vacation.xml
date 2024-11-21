@@ -2,12 +2,19 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:padding="16dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="?attr/colorPrimary" />
 
         <!-- This is the input for Vacation Title -->
         <EditText
@@ -26,20 +33,31 @@
             android:inputType="text" />
 
         <!-- Start date input -->
-        <EditText
-            android:id="@+id/editTextStartDate"
+        <TextView
+            android:id="@+id/textViewStartDate"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Start Date (yyyy-MM-dd)"
-            android:inputType="date" />
+            android:text="Start Date"
+            android:hint="Select Start Date" />
 
-        <!-- End date input -->
-        <EditText
-            android:id="@+id/editTextEndDate"
+        <Button
+            android:id="@+id/buttonPickStartDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Pick Start Date" />
+
+        <TextView
+            android:id="@+id/textViewEndDate"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="End Date (yyyy-MM-dd)"
-            android:inputType="date" />
+            android:text="End Date"
+            android:hint="Select End Date" />
+
+        <Button
+            android:id="@+id/buttonPickEndDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Pick End Date" />
 
         <!-- The save button -->
         <Button

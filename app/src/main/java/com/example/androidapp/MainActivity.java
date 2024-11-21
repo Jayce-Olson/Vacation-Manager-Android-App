@@ -1,5 +1,7 @@
 package com.example.androidapp;
 
+import static androidx.core.content.ContextCompat.startActivity;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -71,7 +73,7 @@ public class MainActivity extends AppCompatActivity { // Apps than extend AppCom
         * will be more methods related to recyclerViews effiecient rendering/updating in VacationAdapter.java and
         * VacationEntity.java.
         * */
-        adapter = new VacationAdapter();
+        adapter = new VacationAdapter(MainActivity.this);
         recyclerView.setAdapter(adapter);
 
 
@@ -132,4 +134,5 @@ public class MainActivity extends AppCompatActivity { // Apps than extend AppCom
         });
 
     }
+
 }

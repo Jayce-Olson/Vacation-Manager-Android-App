@@ -47,5 +47,6 @@ dependencies {
 
     // Optional - Testing
     testImplementation 'androidx.room:room-testing:2.6.1'
+    implementation "androidx.recyclerview:recyclerview:1.2.1"
 
 }
