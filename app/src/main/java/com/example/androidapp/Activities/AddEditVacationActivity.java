@@ -1,13 +1,15 @@
 package com.example.androidapp.Activities;
 
-import android.app.DatePickerDialog;
+import com.example.androidapp.Helpers.DateClickHelper;
+import com.example.androidapp.Helpers.PopupClickHelper;
+
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -17,13 +19,8 @@ import com.example.androidapp.Entities.VacationEntity;
 import com.example.androidapp.R;
 import com.example.androidapp.Database.VacationsDatabase;
 
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.function.Consumer;
 
 public class AddEditVacationActivity extends AppCompatActivity {
 
@@ -37,95 +34,20 @@ public class AddEditVacationActivity extends AppCompatActivity {
      */
     private EditText editTextTitle, editTextHotel,  editTextEndDate;
     private TextView textViewStartDate, textViewEndDate;
+    private Toolbar toolbar;
+    private ImageView menuButton;
     private Button buttonSave, buttonPickStartDate, buttonPickEndDate;
-    private Date startDate = null, endDate = null;
     boolean isEditMode = false;
-    VacationEntity vacation;
+    private VacationEntity vacation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState); // Retrieves the current saved instance state (if any -- there most likely will be with this Activity)
         setContentView(R.layout.activity_add_edit_vacation); // Sets the current content view to the activity_add_edit_vacation.xml file
 
-        /* Below, the class variables are being set equal/bound to the XML components  */
-        editTextTitle = findViewById(R.id.editTextTitle);
-        editTextHotel = findViewById(R.id.editTextHotel);
-        textViewStartDate = findViewById(R.id.textViewStartDate);
-        textViewEndDate = findViewById(R.id.textViewEndDate);
-        buttonSave = findViewById(R.id.buttonSave);
+        bindAndSetComponents(); // Method set up to bind Xml components to class variables (and pre fill areas if editing)
+        setupButtons(); // Method setup to handle the listeners for the buttons on the activity
 
-        Intent intent = getIntent(); // Getting intent to access any potentially passed data - There will be no data if add icon was clicked
-
-        isEditMode = intent.getBooleanExtra("isEditMode", false); // false is the default value "isEditMode" was not passed
-
-        /* Below is the logic for if an existing item was clicked on to be edited.*/
-        if (isEditMode) {
-            // Retrieve passed intent data
-            vacation =  (VacationEntity) getIntent().getSerializableExtra("vacation");
-            String title = vacation.getTitle();
-            String hotel = vacation.getHotel();
-            String startDate = vacation.getStartDate();
-            String endDate = vacation.getEndDate();
-            // Set fields
-            editTextTitle.setText(title);
-            textViewStartDate.setText(startDate);
-            textViewEndDate.setText(endDate);
-            editTextHotel.setText(hotel);
-        }
-
-        /* setOnClickListener attached to the save button that calls the saveVacation method within this class */
-        buttonSave.setOnClickListener(view -> saveVacation());
-
-        // Functionality for the back button (it is on a "custom" toolbar)
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
-        toolbar.setNavigationOnClickListener(v -> onBackPressed());
-
-        // The buttons for choosing the date
-        textViewStartDate = findViewById(R.id.textViewStartDate);
-        textViewEndDate = findViewById(R.id.textViewEndDate);
-        buttonPickStartDate = findViewById(R.id.buttonPickStartDate);
-        buttonPickEndDate = findViewById(R.id.buttonPickEndDate);
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        dateFormat.setLenient(false); // Enforces format
-
-        // Pick start date button with validation logic
-        buttonPickStartDate.setOnClickListener(view -> showDatePicker((date) -> {
-            try {
-                startDate = dateFormat.parse(date);
-                if(endDate==null){
-                    textViewStartDate.setText(date);
-                    return;
-                }
-                if(startDate.before(endDate)) {
-                    textViewStartDate.setText(date);
-                }
-                Toast.makeText(this, "Invalid date", Toast.LENGTH_SHORT).show();
-            }catch (Exception e) {
-                Log.e("DateParsingError", "Error parsing start date: " + date, e);
-            }
-        }));
-
-        // Pick end date button with validation logic
-        buttonPickEndDate.setOnClickListener(v -> showDatePicker((date) -> {
-            try {
-                endDate = dateFormat.parse(date);
-                if(startDate==null) { // no need to validate if endate is before startdate if the startdate is null
-                    textViewEndDate.setText(date);
-                    return;
-                }
-                if(endDate.after(startDate)){ // validate end date
-                    textViewEndDate.setText(date);
-                    return;
-                }
-                Toast.makeText(this, "Invalid input date", Toast.LENGTH_SHORT).show();
-            }catch (Exception e){
-                Log.e("DateParsingError", "Error parsing start date: " + date, e);
-
-            }
-        }));
     }
 
     private void saveVacation() { // Only called on save button click
@@ -148,7 +70,7 @@ public class AddEditVacationActivity extends AppCompatActivity {
         }else {// A new VacationEntity object is created and inserted into the database
             VacationEntity vacation = new VacationEntity(title, hotel, startDate, endDate);
             databaseThread.execute(() -> { // Second thread for database operations, allows main thread to focus on UI and not freeze UI
-                /*
+                /* (this comment is only here because this is a school assignment and I wanted to write is down to help learn/remember it - I would not do this in professional environment):
                  * The line below, .getInstance() is a singleton method within the VacationsDatabase class,
                  * which basically means that the instance field inside of vacationsDatabase is static and there is
                  * only one instance of it across this entire app. It takes the parameter "context" in case an instance
@@ -166,14 +88,70 @@ public class AddEditVacationActivity extends AppCompatActivity {
         finish(); // This is part of the Activity class. It "finishes"/closes the current activity and removes it from the activity stack
     }
 
-    private void showDatePicker(Consumer<String> callback) { // I am using consumer string to call lambda rather than having it implement an interface method
-        // This shows the date picker menu overlay
-        DatePickerDialog datePickerDialog = new DatePickerDialog(this, (view, year, month, dayOfMonth) -> {
-            String date = year + "-" + (month + 1) + "-" + dayOfMonth;
-            /* The code in .onDatePicked() will be the lambda/callback, date will be passed to it */
-            callback.accept(date);
-        }, 2024, 0, 1);
-        datePickerDialog.show();
+
+
+    private void bindAndSetComponents(){
+        // Below, the class variables are being set equal/bound to the XML components
+        // Title/Hotel
+        editTextTitle = findViewById(R.id.editTextTitle);
+        editTextHotel = findViewById(R.id.editTextHotel);
+        // Save button
+        buttonSave = findViewById(R.id.buttonSave);
+        // Popup menu button
+        menuButton = findViewById(R.id.menuButton);
+
+        // The initialization and configuration for the custom toolbar that the back button is attached to
+        toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        // The text views and buttons for choosing the date
+        textViewStartDate = findViewById(R.id.textViewStartDate);
+        textViewEndDate = findViewById(R.id.textViewEndDate);
+        buttonPickStartDate = findViewById(R.id.buttonPickStartDate);
+        buttonPickEndDate = findViewById(R.id.buttonPickEndDate);
+
+        // Check if intent is for editing/creating with method inside this class
+        checkMode();
+
+    }
+
+    private void checkMode(){
+        // Getting intent to access any potentially passed data - There will be no data if add icon was clicked
+        Intent intent = getIntent();
+        // Retrieve intent info
+        isEditMode = intent.getBooleanExtra("isEditMode", false); // false is the default value "isEditMode" was not passed
+
+        /* Below is the logic for if an existing item was clicked on to be edited.*/
+        if (isEditMode) {
+            // Retrieve passed intent data
+            vacation = (VacationEntity) getIntent().getSerializableExtra("vacation");
+            String title = vacation.getTitle();
+            String hotel = vacation.getHotel();
+            String startDate = vacation.getStartDate();
+            String endDate = vacation.getEndDate();
+            // Set fields
+            editTextTitle.setText(title);
+            textViewStartDate.setText(startDate);
+            textViewEndDate.setText(endDate);
+            editTextHotel.setText(hotel);
+        }
+    }
+
+    private void setupButtons(){
+        /* setOnClickListener attached to the save button that calls the saveVacation method within this class */
+        buttonSave.setOnClickListener(view -> saveVacation()); // I didn't put this in it's own file due to a lack of logic
+
+        // Functionality for the back button (it is on a "custom" toolbar)
+        toolbar.setNavigationOnClickListener(v -> onBackPressed());
+
+        // There is a separate set of these buttons for each items, which means separate values for start and end date.
+        // which is why I decided not to make it static
+        DateClickHelper dateClickHelper = new DateClickHelper();
+        dateClickHelper.dateListener(this, buttonPickStartDate, buttonPickEndDate, textViewStartDate, textViewEndDate); // passing the button components
+        // Listener and logic for the popup menu button - static method in PopupClickHelper file (within helper package)
+        Activity activity = (Activity) this; // Activity will be needed for permissions later
+        PopupClickHelper.popupListener(this, menuButton, vacation, activity);
     }
 
 }

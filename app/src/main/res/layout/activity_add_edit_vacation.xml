@@ -66,6 +66,20 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:text="Save" />
+        <TextView
+            android:id="@+id/textViewNotifications"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="End Date"
+            android:hint="Toggle Notifications" />
+        <ImageView
+            android:id="@+id/menuButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_back_arrow"
+        android:contentDescription="Menu"
+        android:layout_gravity="end"
+        android:padding="8dp" />
     </LinearLayout>
 </ScrollView>
 
