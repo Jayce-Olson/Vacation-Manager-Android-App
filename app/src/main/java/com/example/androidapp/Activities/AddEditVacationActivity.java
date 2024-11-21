@@ -18,6 +18,7 @@ import com.example.androidapp.R;
 import com.example.androidapp.Database.VacationsDatabase;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
@@ -38,6 +39,8 @@ public class AddEditVacationActivity extends AppCompatActivity {
     private TextView textViewStartDate, textViewEndDate;
     private Button buttonSave, buttonPickStartDate, buttonPickEndDate;
     private Date startDate = null, endDate = null;
+    boolean isEditMode = false;
+    VacationEntity vacation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,15 +56,16 @@ public class AddEditVacationActivity extends AppCompatActivity {
 
         Intent intent = getIntent(); // Getting intent to access any potentially passed data - There will be no data if add icon was clicked
 
-        boolean isEditMode = intent.getBooleanExtra("isEditMode", false); // false is the default value "isEditMode" was not passed
+        isEditMode = intent.getBooleanExtra("isEditMode", false); // false is the default value "isEditMode" was not passed
 
-
+        /* Below is the logic for if an existing item was clicked on to be edited.*/
         if (isEditMode) {
             // Retrieve passed intent data
-            String title = intent.getStringExtra("Title");
-            String startDate = intent.getStringExtra("StartDate");
-            String endDate = intent.getStringExtra("EndDate");
-            String hotel = intent.getStringExtra("Hotel");
+            vacation =  (VacationEntity) getIntent().getSerializableExtra("vacation");
+            String title = vacation.getTitle();
+            String hotel = vacation.getHotel();
+            String startDate = vacation.getStartDate();
+            String endDate = vacation.getEndDate();
             // Set fields
             editTextTitle.setText(title);
             textViewStartDate.setText(startDate);
@@ -85,7 +89,7 @@ public class AddEditVacationActivity extends AppCompatActivity {
         buttonPickStartDate = findViewById(R.id.buttonPickStartDate);
         buttonPickEndDate = findViewById(R.id.buttonPickEndDate);
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        dateFormat.setLenient(false);
+        dateFormat.setLenient(false); // Enforces format
 
         // Pick start date button with validation logic
         buttonPickStartDate.setOnClickListener(view -> showDatePicker((date) -> {
@@ -124,31 +128,40 @@ public class AddEditVacationActivity extends AppCompatActivity {
         }));
     }
 
-    private void saveVacation() {
-        ExecutorService databaseThread = Executors.newSingleThreadExecutor();
+    private void saveVacation() { // Only called on save button click
+
         // Below initializes variables to store the values inputted to the EditText widgets
         String title = editTextTitle.getText().toString(); // gets the text within the field and converts it to a string
         String hotel = editTextHotel.getText().toString();
         String startDate = textViewStartDate.getText().toString();
         String endDate = textViewEndDate.getText().toString();
+        ExecutorService databaseThread = Executors.newSingleThreadExecutor();
 
-        // A new VacationEntity object is createed and inserted into the database
-        VacationEntity vacation = new VacationEntity(title, hotel, startDate, endDate);
-
-        databaseThread.execute(() -> { // Second thread for database operations, allows main thread to focus on UI and not freeze UI
-            /*
-             * The line below, .getInstance() is a singleton method within the VacationsDatabase class,
-             * which basically means that the instance field inside of vacationsDatabase is static and there is
-             * only one instance of it across this entire app. It takes the parameter "context" in case an instance
-             * does not exist, because in order to create an instance, context is required (this will allow the room
-             * databaseBuilder to sync with the apps lifecycle and know where to store the database file).
-             *
-             * .vacationDAO accesses the DAO interface (which the room framework has implemented)
-             *  for the vacations table and .insertVacation() inserts the passed value into the table.
-             *
-             */
-            VacationsDatabase.getInstance(this).vacationDao().insertVacation(vacation);
-        });
+        if(isEditMode){ // update current entity with new information
+            vacation.setTitle(title);
+            vacation.setHotel(hotel);
+            vacation.setStartDate(startDate);
+            vacation.setEndDate(endDate);
+            databaseThread.execute(() -> {
+                VacationsDatabase.getInstance(this).vacationDao().updateVacation(vacation);
+            });
+        }else {// A new VacationEntity object is created and inserted into the database
+            VacationEntity vacation = new VacationEntity(title, hotel, startDate, endDate);
+            databaseThread.execute(() -> { // Second thread for database operations, allows main thread to focus on UI and not freeze UI
+                /*
+                 * The line below, .getInstance() is a singleton method within the VacationsDatabase class,
+                 * which basically means that the instance field inside of vacationsDatabase is static and there is
+                 * only one instance of it across this entire app. It takes the parameter "context" in case an instance
+                 * does not exist, because in order to create an instance, context is required (this will allow the room
+                 * databaseBuilder to sync with the apps lifecycle and know where to store the database file).
+                 *
+                 * .vacationDAO accesses the DAO interface (which the room framework has implemented)
+                 *  for the vacations table and .insertVacation() inserts the passed value into the table.
+                 *
+                 */
+                VacationsDatabase.getInstance(this).vacationDao().insertVacation(vacation);
+            });
+        }
         databaseThread.shutdown();
         finish(); // This is part of the Activity class. It "finishes"/closes the current activity and removes it from the activity stack
     }

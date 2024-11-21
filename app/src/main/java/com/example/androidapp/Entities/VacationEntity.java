@@ -6,10 +6,11 @@ import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
+import java.io.Serializable;
 import java.util.Objects;
 
 @Entity(tableName = "vacations")
-public class VacationEntity {
+public class VacationEntity implements Serializable { // This later implements Serializable so I can pass it through Intent() (within VacationAdapter)
     @PrimaryKey(autoGenerate = true)
     private int id;
 
@@ -101,18 +102,32 @@ public class VacationEntity {
         return title;
     }
 
+    public void setTitle(String title) {
+        this.title = title;
+    }
 
     public String getHotel() {
         return hotel;
+    }
+
+    public void setHotel(String hotel) {
+        this.hotel = hotel;
     }
 
     public String getStartDate() {
         return startDate;
     }
 
+    public void setStartDate(String startDate) {
+        this.startDate = startDate;
+    }
 
     public String getEndDate() {
         return endDate;
+    }
+
+    public void setEndDate(String endDate) {
+        this.endDate = endDate;
     }
 
 }

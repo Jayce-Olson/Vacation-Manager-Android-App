@@ -18,6 +18,8 @@ import com.example.androidapp.Entities.VacationEntity;
 import com.example.androidapp.MainActivity;
 import com.example.androidapp.R;
 
+import java.util.ArrayList;
+
 // This class is for binding vacation data to the view. It acts as a middle man between the database and the view(UI).
 // It is slightly more complex than it needed to be for this project because I decided to use a recycler view instead of
 // just a list view. (I free up and re use views as the user scrolls through the list of vacations -- although since this
@@ -135,10 +137,9 @@ public class VacationAdapter extends ListAdapter<VacationEntity, VacationAdapter
 // Below will be called when an item is clicked on. It opens the add/edit activity and auto fills it with the data of the clicked item.
     public void onItemClick(VacationEntity vacation){
         Intent intent = new Intent(context, AddEditVacationActivity.class);
-        intent.putExtra("Title", vacation.getTitle());
-        intent.putExtra("StartDate", vacation.getStartDate());
-        intent.putExtra("EndDate", vacation.getEndDate());
-        intent.putExtra("Hotel", vacation.getHotel());
+        /* The reason vacation implements serializable is for this one line below */
+        intent.putExtra("vacation", vacation);
+        // Below is so that the add/edit activity can know which mode it is in
         intent.putExtra("isEditMode", true);
         context.startActivity(intent); // Adapter doesn't have the startActivity method so I need to use context.
     }
