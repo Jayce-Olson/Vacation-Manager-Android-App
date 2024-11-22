@@ -78,7 +78,7 @@
             android:id="@+id/menuButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/ic_back_arrow"
+            android:src="@drawable/baseline_menu_24"
             android:contentDescription="Menu"
             android:layout_gravity="end"
             android:padding="8dp" />
