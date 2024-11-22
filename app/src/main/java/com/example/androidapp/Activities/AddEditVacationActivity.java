@@ -1,5 +1,7 @@
 package com.example.androidapp.Activities;
 
+import com.example.androidapp.Adapters.ExcursionAdapter;
+import com.example.androidapp.Adapters.VacationAdapter;
 import com.example.androidapp.Helpers.DateClickHelper;
 import com.example.androidapp.Helpers.PopupClickHelper;
 
@@ -7,6 +9,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -16,8 +19,11 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.androidapp.Entities.VacationEntity;
+import com.example.androidapp.MainActivity;
 import com.example.androidapp.R;
 import com.example.androidapp.Database.VacationsDatabase;
 
@@ -41,6 +47,9 @@ public class AddEditVacationActivity extends AppCompatActivity {
     private Button buttonSave, buttonPickStartDate, buttonPickEndDate;
     boolean isEditMode = false;
     private VacationEntity vacation;
+    private RecyclerView recyclerView;
+    private ExcursionAdapter adapter;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,31 +75,26 @@ public class AddEditVacationActivity extends AppCompatActivity {
             return;
         }
 
-        if(isEditMode){ // update current entity with new information
-            vacation.setTitle(title);
-            vacation.setHotel(hotel);
-            vacation.setStartDate(startDate);
-            vacation.setEndDate(endDate);
-            databaseThread.execute(() -> {
-                VacationsDatabase.getInstance(this).vacationDao().updateVacation(vacation);
-            });
-        }else {// A new VacationEntity object is created and inserted into the database
-            VacationEntity vacation = new VacationEntity(title, hotel, startDate, endDate);
-            databaseThread.execute(() -> { // Second thread for database operations, allows main thread to focus on UI and not freeze UI
-                /* (this comment is only here because this is a school assignment and I wanted to write is down to help learn/remember it - I would not do this in professional environment):
-                 * The line below, .getInstance() is a singleton method within the VacationsDatabase class,
-                 * which basically means that the instance field inside of vacationsDatabase is static and there is
-                 * only one instance of it across this entire app. It takes the parameter "context" in case an instance
-                 * does not exist, because in order to create an instance, context is required (this will allow the room
-                 * databaseBuilder to sync with the apps lifecycle and know where to store the database file).
-                 *
-                 * .vacationDAO accesses the DAO interface (which the room framework has implemented)
-                 *  for the vacations table and .insertVacation() inserts the passed value into the table.
-                 *
-                 */
-                VacationsDatabase.getInstance(this).vacationDao().insertVacation(vacation);
-            });
-        }
+        if(!isEditMode) vacation = new VacationEntity(title, hotel, startDate, endDate);
+        vacation.setTitle(title);
+        vacation.setHotel(hotel);
+        vacation.setStartDate(startDate);
+        vacation.setEndDate(endDate);
+        databaseThread.execute(() -> {
+            /* (this comment is only here because this is a school assignment and I wanted to write is down to help learn/remember it - I would not do this in professional environment):
+             * The line below, .getInstance() is a singleton method within the VacationsDatabase class,
+             * which basically means that the instance field inside of vacationsDatabase is static and there is
+             * only one instance of it across this entire app. It takes the parameter "context" in case an instance
+             * does not exist, because in order to create an instance, context is required (this will allow the room
+             * databaseBuilder to sync with the apps lifecycle and know where to store the database file).
+             *
+             * .vacationDAO accesses the DAO interface (which the room framework has implemented)
+             *  for the vacations table and .insertVacation() inserts the passed value into the table.
+             *
+             */
+            if(isEditMode) VacationsDatabase.getInstance(this).vacationDao().updateVacation(vacation);
+            if(!isEditMode) VacationsDatabase.getInstance(this).vacationDao().insertVacation(vacation);
+        });
         databaseThread.shutdown();
         finish(); // This is part of the Activity class. It "finishes"/closes the current activity and removes it from the activity stack
     }
@@ -131,17 +135,29 @@ public class AddEditVacationActivity extends AppCompatActivity {
 
         /* Below is the logic for if an existing item was clicked on to be edited.*/
         if (isEditMode) {
+
             // Retrieve passed intent data
-            vacation = (VacationEntity) getIntent().getSerializableExtra("vacation");
+            vacation = (VacationEntity) intent.getSerializableExtra("vacation");
             String title = vacation.getTitle();
             String hotel = vacation.getHotel();
             String startDate = vacation.getStartDate();
             String endDate = vacation.getEndDate();
+
             // Set fields
             editTextTitle.setText(title);
             textViewStartDate.setText(startDate);
             textViewEndDate.setText(endDate);
             editTextHotel.setText(hotel);
+
+            // Excursions below
+            recyclerView = findViewById(R.id.recyclerViewExcursions);
+            recyclerView.setLayoutManager(new LinearLayoutManager(this)); // Set the LayoutManager
+            adapter = new ExcursionAdapter(AddEditVacationActivity.this);
+            recyclerView.setAdapter(adapter);
+            VacationsDatabase db = VacationsDatabase.getInstance(this); // Retrieves instance of database
+            db.excursionDao().getExcursionsForVacation(vacation.getId()).observe(this, excursions -> { // stores Vacation Entities in a list (vacations). Using observe because of multithreading
+                adapter.submitList(excursions);
+            });
         }
     }
 
@@ -156,6 +172,19 @@ public class AddEditVacationActivity extends AppCompatActivity {
         // which is why I decided not to make it static
         DateClickHelper dateClickHelper = new DateClickHelper();
         dateClickHelper.dateListener(this, buttonPickStartDate, buttonPickEndDate, textViewStartDate, textViewEndDate); // passing the button components
+
+        Button buttonAddExcursion = findViewById(R.id.buttonAddExcursion);
+        buttonAddExcursion.setOnClickListener(v -> {
+            Intent intent = new Intent(this, ExcursionAddEditActivity.class);
+            if (vacation != null) {
+                intent.putExtra("VACATION", vacation);
+                intent.putExtra("isEditMode", false);
+                startActivity(intent);
+                return;
+            }
+            Toast.makeText(this, "You can only add excursion after vacation is created.", Toast.LENGTH_SHORT).show();
+        });
+
         // Listener and logic for the popup menu button - static method in PopupClickHelper file (within helper package)
         Activity activity = (Activity) this; // Activity will be needed for permissions later
         PopupClickHelper.popupListener(this, menuButton, vacation, activity);

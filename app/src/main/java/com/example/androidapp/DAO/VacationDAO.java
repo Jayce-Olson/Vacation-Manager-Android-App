@@ -23,9 +23,10 @@ public interface VacationDAO { // How to interact with Vacation table below - Ta
     @Delete
     void deleteVacation(VacationEntity vacation);
 
-    @Query("SELECT * FROM vacations")
-        // Using LiveData automatically multithreads the query - Doesn't work for writing to DB so that is why it isn't used above
+    @Query("SELECT * FROM vacations") // Using LiveData automatically multithreads the query - Doesn't work for writing to DB so that is why it isn't used above
     LiveData<List<VacationEntity>> getAllVacations();
 
+    @Query("SELECT * FROM vacations WHERE id = :vacationId")
+    VacationEntity getVacationById(int vacationId);
 
 }

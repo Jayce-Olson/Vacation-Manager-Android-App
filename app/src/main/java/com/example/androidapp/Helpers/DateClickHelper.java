@@ -6,6 +6,7 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.androidapp.Entities.VacationEntity;
 import com.example.androidapp.Utilities.DateUtils;
 
 import java.text.SimpleDateFormat;
@@ -13,6 +14,7 @@ import java.util.Date;
 
 public class DateClickHelper {
     private Date startDate = null, endDate = null;
+    private Date excursionDate = null;
     public void dateListener(Context context, Button buttonPickStartDate, Button buttonPickEndDate, TextView textViewStartDate, TextView textViewEndDate){
 
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
@@ -45,6 +47,29 @@ public class DateClickHelper {
                 }
                 if(endDate.after(startDate)){ // validate end date
                     textViewEndDate.setText(date);
+                    return;
+                }
+                Toast.makeText(context, "Invalid input date", Toast.LENGTH_SHORT).show();
+            }catch (Exception e){
+                Log.e("DateParsingError", "Error parsing start date: " + date, e);
+
+            }
+        }));
+    }
+
+    public void dateExcursionListener(Context context, Button buttonPickDate, TextView textViewDate, String sDate, String eDate){
+
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        dateFormat.setLenient(false); // Enforces format
+
+        buttonPickDate.setOnClickListener(view -> DateUtils.showDatePicker(context, date -> {
+
+            try {
+                excursionDate = dateFormat.parse(date); // this is just for .after/.before methods
+                startDate = dateFormat.parse(sDate);
+                endDate = dateFormat.parse(eDate);
+                if((startDate.before(excursionDate) && endDate.after(excursionDate)) || startDate.equals(excursionDate) || endDate.equals(excursionDate)){
+                    textViewDate.setText(date);
                     return;
                 }
                 Toast.makeText(context, "Invalid input date", Toast.LENGTH_SHORT).show();

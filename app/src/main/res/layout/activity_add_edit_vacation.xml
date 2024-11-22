@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.core.widget.NestedScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:padding="16dp">
 
     <LinearLayout
@@ -16,7 +16,7 @@
             android:layout_height="?attr/actionBarSize"
             android:background="?attr/colorPrimary" />
 
-        <!-- This is the input for Vacation Title -->
+        <!-- Vacation Title Input -->
         <EditText
             android:id="@+id/editTextTitle"
             android:layout_width="match_parent"
@@ -24,7 +24,7 @@
             android:hint="Title"
             android:inputType="text" />
 
-        <!-- This is the input for Hotel -->
+        <!-- Hotel Input -->
         <EditText
             android:id="@+id/editTextHotel"
             android:layout_width="match_parent"
@@ -32,7 +32,7 @@
             android:hint="Hotel"
             android:inputType="text" />
 
-        <!-- Start date input -->
+        <!-- Start Date Input -->
         <TextView
             android:id="@+id/textViewStartDate"
             android:layout_width="match_parent"
@@ -46,6 +46,7 @@
             android:layout_height="wrap_content"
             android:text="Pick Start Date" />
 
+        <!-- End Date Input -->
         <TextView
             android:id="@+id/textViewEndDate"
             android:layout_width="match_parent"
@@ -59,7 +60,13 @@
             android:layout_height="wrap_content"
             android:text="Pick End Date" />
 
-        <!-- The save button -->
+        <Button
+            android:id="@+id/buttonAddExcursion"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Add Excursion" />
+
+        <!-- Save Button -->
         <Button
             android:id="@+id/buttonSave"
             android:layout_width="match_parent"
@@ -72,9 +79,17 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/ic_back_arrow"
-        android:contentDescription="Menu"
-        android:layout_gravity="end"
-        android:padding="8dp" />
+            android:contentDescription="Menu"
+            android:layout_gravity="end"
+            android:padding="8dp" />
+
+        <!-- Excursions RecyclerView -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerViewExcursions"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:nestedScrollingEnabled="false" />
+
     </LinearLayout>
-</ScrollView>
+</androidx.core.widget.NestedScrollView>
 

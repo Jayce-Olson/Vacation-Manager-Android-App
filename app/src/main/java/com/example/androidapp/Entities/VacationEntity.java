@@ -21,10 +21,10 @@ public class VacationEntity implements Serializable { // This later implements S
     @ColumnInfo(name="hotel")
     private String hotel;
 
-    @ColumnInfo(name="start")
+    @ColumnInfo(name="start_date")
     private String startDate;
 
-    @ColumnInfo(name="end")
+    @ColumnInfo(name="end_date")
     private String endDate;
 
 

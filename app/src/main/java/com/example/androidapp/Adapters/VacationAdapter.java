@@ -10,15 +10,21 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.lifecycle.LifecycleOwner;
+import androidx.lifecycle.LiveData;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.androidapp.Activities.AddEditVacationActivity;
+import com.example.androidapp.Database.VacationsDatabase;
+import com.example.androidapp.Entities.ExcursionEntity;
 import com.example.androidapp.Entities.VacationEntity;
 import com.example.androidapp.MainActivity;
 import com.example.androidapp.R;
 
 import java.util.ArrayList;
+import java.util.List;
 
 // This class is for binding vacation data to the view. It acts as a middle man between the database and the view(UI).
 // It is slightly more complex than it needed to be for this project because I decided to use a recycler view instead of
@@ -34,6 +40,7 @@ public class VacationAdapter extends ListAdapter<VacationEntity, VacationAdapter
     for the "save" button.
      */
     private Context context;
+
 
 
     public VacationAdapter(Context context) {
@@ -102,6 +109,9 @@ public class VacationAdapter extends ListAdapter<VacationEntity, VacationAdapter
         private final TextView textViewHotel;
         private final TextView textViewStartDate;
         private final TextView textViewEndDate;
+        private ExcursionAdapter excursionAdapter;
+        private RecyclerView recyclerViewExcursions;
+
         public VacationViewHolder(View itemView) {
             /* Below, itemView needs to be passed to the parent class so that RecyclerView.ViewHolder knows (has a reference to)
              * which view it is handling. Without it methods (that rely on view) would return errors as the view it is working with
@@ -116,6 +126,12 @@ public class VacationAdapter extends ListAdapter<VacationEntity, VacationAdapter
             textViewStartDate = itemView.findViewById(R.id.textViewStartDate);
             textViewEndDate = itemView.findViewById(R.id.textViewEndDate);
 
+            // Excursion recycler view inside current recycler view, below
+            recyclerViewExcursions = itemView.findViewById(R.id.recyclerViewExcursions);
+            recyclerViewExcursions.setLayoutManager(new LinearLayoutManager(itemView.getContext()));
+            excursionAdapter = new ExcursionAdapter(context);
+            recyclerViewExcursions.setAdapter(excursionAdapter);
+
             // If I end up implementing another Adapter file then I will decouple this and put the onClick listener into it's own file
             itemView.setOnClickListener(view -> { // onClick listener that will go on each item view in the list.
                     onItemClick(getItem(getBindingAdapterPosition()));
@@ -128,6 +144,13 @@ public class VacationAdapter extends ListAdapter<VacationEntity, VacationAdapter
             textViewHotel.setText(vacation.getHotel());
             textViewStartDate.setText(vacation.getStartDate());
             textViewEndDate.setText(vacation.getEndDate());
+            // Fetch excursions for this vacation and submit them to the adapter
+            VacationsDatabase db = VacationsDatabase.getInstance(itemView.getContext());
+            db.excursionDao().getExcursionsForVacation(vacation.getId()).observe((LifecycleOwner) context, excursions -> {
+                // 'excursions' is the List<ExcursionEntity>
+                excursionAdapter.submitList(excursions);
+            });
+
         }
     }
 
