@@ -1,5 +1,6 @@
 package com.example.androidapp.Helpers;
 
+import com.example.androidapp.Database.VacationsDatabase;
 import com.example.androidapp.Utilities.PermissionUtils;
 
 import android.app.Activity;
@@ -12,6 +13,9 @@ import com.example.androidapp.Entities.VacationEntity;
 import com.example.androidapp.R;
 import com.example.androidapp.Utilities.NotificationUtils;
 import com.example.androidapp.Utilities.SharingUtils;
+
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class PopupClickHelper {
     public static void popupListener(Context context, ImageView menuButton, VacationEntity vacation, Activity activity){
@@ -34,6 +38,15 @@ public class PopupClickHelper {
                         permissionUtils.checkAndRequestNotificationPermission(context);
                     }
                     return true; // onMenuItemClick expects a return value so this must return a value
+                }
+                if(item.getItemId() == R.id.menu_delete) {
+                    ExecutorService databaseThread = Executors.newSingleThreadExecutor();
+                    databaseThread.execute(() -> {
+                        VacationsDatabase.getInstance(context).vacationDao().deleteVacation(vacation);
+                    });
+                    databaseThread.shutdown();
+                    activity.finish();
+                    return true;
                 }
                 // case R.id.menu_share:
                 SharingUtils.shareDetails(context,vacation);

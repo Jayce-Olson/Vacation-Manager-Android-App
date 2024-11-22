@@ -6,10 +6,12 @@ import com.example.androidapp.Helpers.PopupClickHelper;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -58,6 +60,11 @@ public class AddEditVacationActivity extends AppCompatActivity {
         String startDate = textViewStartDate.getText().toString();
         String endDate = textViewEndDate.getText().toString();
         ExecutorService databaseThread = Executors.newSingleThreadExecutor();
+
+        if(title.isEmpty() || hotel.isEmpty() || startDate.equals("Start Date") || endDate.equals("End Date")){
+            Toast.makeText(this, "Please enter all fields", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
         if(isEditMode){ // update current entity with new information
             vacation.setTitle(title);
