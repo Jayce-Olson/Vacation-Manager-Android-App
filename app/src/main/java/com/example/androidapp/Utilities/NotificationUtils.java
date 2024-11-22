@@ -5,6 +5,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.util.Log;
 import android.widget.Toast;
 
 import androidx.core.content.ContextCompat;
@@ -23,6 +24,7 @@ public class NotificationUtils {
             if (ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS)
                     != PackageManager.PERMISSION_GRANTED) {
                 // Do not proceed without permission
+                PermissionUtils.requestExactAlarmPermission(context);
                 Toast.makeText(context, "Notification permission is required", Toast.LENGTH_SHORT).show();
                 return;
             }
@@ -61,6 +63,7 @@ public class NotificationUtils {
             Toast.makeText(context, "Notification set for " + title + " on " + startDate, Toast.LENGTH_SHORT).show();
         } catch (Exception e) {
             Toast.makeText(context, "Failed to set notification: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            Log.e("Notification","Failed to set notification: " + e.getMessage(), e);
         }
     }
 }
