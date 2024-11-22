@@ -18,6 +18,7 @@ import com.example.androidapp.Entities.VacationEntity;
 import com.example.androidapp.Helpers.DateClickHelper;
 import com.example.androidapp.Helpers.PopupClickHelper;
 import com.example.androidapp.R;
+import com.example.androidapp.Utilities.NotificationUtils;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -25,7 +26,7 @@ import java.util.concurrent.Executors;
 public class ExcursionAddEditActivity extends AppCompatActivity {
     private EditText editTextExcursionTitle;
     private TextView textViewDate;
-    private Button saveButton, deleteButton, buttonPickDate;
+    private Button saveButton, deleteButton, buttonPickDate, notificationButton;
     private Toolbar toolbar;
     private int vacationId;
     private Boolean isEditMode;
@@ -48,6 +49,7 @@ public class ExcursionAddEditActivity extends AppCompatActivity {
         textViewDate = findViewById(R.id.textViewDate);
         buttonPickDate = findViewById(R.id.buttonPickDate);
         saveButton = findViewById(R.id.saveButton);
+        notificationButton = findViewById(R.id.notificationButton);
         deleteButton = findViewById(R.id.deleteButton);
         vacation = (VacationEntity) getIntent().getSerializableExtra("VACATION");
         vacationId = vacation.getId();
@@ -81,6 +83,11 @@ public class ExcursionAddEditActivity extends AppCompatActivity {
 
         saveButton.setOnClickListener(v -> {
           save();
+        });
+
+        notificationButton.setOnClickListener(v -> {
+            if(isEditMode) NotificationUtils.setNotification(this, excursion.getTitle(), excursion.getDate());
+            if(!isEditMode) Toast.makeText(this, "Create the excursion before setting the notification", Toast.LENGTH_LONG).show();
         });
 
         // There is a separate set of these buttons for each items, which means separate values for dates.

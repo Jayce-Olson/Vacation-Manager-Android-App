@@ -47,6 +47,13 @@
             android:layout_height="wrap_content"
             android:text="Save"
             android:layout_marginTop="24dp" />
+        <!-- Alert button -->
+        <Button
+            android:id="@+id/notificationButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Set Notification"
+            android:layout_marginTop="24dp" />
 
         <!-- Delete Button -->
         <Button
