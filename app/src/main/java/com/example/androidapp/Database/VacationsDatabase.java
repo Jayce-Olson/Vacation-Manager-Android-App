@@ -10,7 +10,7 @@ import com.example.androidapp.DAO.ExcursionDAO;
 import com.example.androidapp.Entities.VacationEntity;
 import com.example.androidapp.Entities.ExcursionEntity;
 
-@Database(entities = {VacationEntity.class, ExcursionEntity.class}, version = 2)
+@Database(entities = {VacationEntity.class, ExcursionEntity.class}, version = 4)
 public abstract class VacationsDatabase extends RoomDatabase { // This is abstract so that the room framework can extend/implement it at runtime
 
     private static VacationsDatabase instance; // Static to hold only a single instance of the Database
