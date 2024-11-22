@@ -23,11 +23,7 @@ public class PermissionUtils {
                     != PackageManager.PERMISSION_GRANTED) {
                 // Launch the permission request
                 launcher.launch(Manifest.permission.POST_NOTIFICATIONS);
-            } else {
-                Toast.makeText(context, "Notification permission already granted", Toast.LENGTH_SHORT).show();
             }
-        } else {
-            Toast.makeText(context, "Permission not required for this Android version", Toast.LENGTH_SHORT).show();
         }
     }
 

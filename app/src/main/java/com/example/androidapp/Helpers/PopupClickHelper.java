@@ -27,7 +27,7 @@ public class PopupClickHelper {
             popupMenu.setOnMenuItemClickListener(item -> {
                 if(item.getItemId() == R.id.menu_set_notification) {
                     // Below calls the setNotification static method within the NotificationUtils class.
-                    NotificationUtils.setNotification(context, vacation.getTitle(), vacation.getStartDate());
+                    NotificationUtils.setNotification(context, vacation.getTitle(), vacation.getStartDate(), vacation.getEndDate());
                     // instantiate PermissionsUtils
                     PermissionUtils permissionUtils = new PermissionUtils();
                     // Register the permission launcher
