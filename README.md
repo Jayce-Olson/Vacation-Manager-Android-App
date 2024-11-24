@@ -1,8 +1,8 @@
 # Title: 
 Vacation Manager
 
-## Purpose:
-To manage vacations and their associated excursions
+## Description:
+This is a vacation manager app for android. It allows you users to schedule vacations and excursions. 
 
 # Instructions:
 The apps homepage will have a list of the already created vacations,
@@ -40,6 +40,3 @@ on the home screen.
 # APK Deployed to:
 minSdk 24
 targetSdk 34
-
-# Github Repository:
-https://gitlab.com/wgu-gitlab-environment/student-repos/jolson20/d308-mobile-application-development-android/-/tree/Working?ref_type=heads
