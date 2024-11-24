@@ -5,7 +5,7 @@ Vacation Manager
 This is a vacation manager app for android. It allows you users to schedule, edit, and delete vacations. Users can also schedule, edit, and delete excursions associated with
 each vacation. The app takes advantage of a recyler view for efficient memory management and takes advantage of the Room Framework to simplify interactions with the SQLLite database.
 
-![App Layout]("/app/app_storyboard.png)
+<img title="App Layout" alt="App Layout" src="/app/App_Storyboard.png">
 
 # Instructions:
 The apps homepage will have a list of the already created vacations,
